@@ -32,17 +32,19 @@ export default function Home() {
   const [genre, setGenre] = useState("");
   const queryData = useRef<{ queries: string[]; genre: string }>({ queries: [], genre: "" });
 
+  const [pixivCounts, setPixivCounts] = useState<
+    Record<
+      string,
+      {
+        all: number;
+        R18: number;
+      }
+    >[]
+  >([]);
+
   const [shouldFetch, setShouldFetch] = useState(false);
 
   const pixivApi = api.pixiv.getIllustCount.useQuery({ ...queryData.current }, { enabled: false });
-
-  let pixivCounts: Record<
-    string,
-    {
-      all: number;
-      R18: number;
-    }
-  >[] = [];
 
   const handleDownloadExcel = (
     apiData:
@@ -77,9 +79,11 @@ export default function Home() {
 
   const handleClick = async () => {
     queryData.current = { queries: safeJsonParse(value, []), genre };
-    pixivCounts = await getIllustCount({ queries: safeJsonParse(value, []), genre });
+    setPixivCounts(await getIllustCount({ queries: safeJsonParse(value, []), genre }));
     // setShouldFetch(true);
   };
+
+  console.log(pixivCounts);
 
   useEffect(() => {
     if (shouldFetch) {
