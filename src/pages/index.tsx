@@ -152,34 +152,32 @@ export default function Home() {
                   <Title order={2} mb={"lg"}>
                     キーワードごとのpixivイラストにおけるR-18率
                   </Title>
+                  <Group justify="flex-end" mt={-40}>
+                    <Button
+                      color="pink"
+                      onClick={() => {
+                        handleDownloadExcel(pixivCounts);
+                      }}
+                      disabled={pixivCounts.length === 0}
+                    >
+                      Excelダウンロード
+                    </Button>
+                  </Group>
                   <Title order={3} mb={"lg"}>
                     ジャンル：{genre === "" ? "指定なし" : genre}
                   </Title>
                   {!isLoading ? (
-                    <>
-                      <Group justify="flex-end" mt={-40}>
-                        <Button
-                          color="pink"
-                          onClick={() => {
-                            handleDownloadExcel(pixivCounts);
-                          }}
-                        >
-                          Excelダウンロード
-                        </Button>
-                      </Group>
-
-                      <Table striped highlightOnHover>
-                        <Table.Thead>
-                          <Table.Tr>
-                            <Table.Th>キーワード</Table.Th>
-                            <Table.Th>全体（件）</Table.Th>
-                            <Table.Th>R-18（件）</Table.Th>
-                            <Table.Th>R-18率（%）</Table.Th>
-                          </Table.Tr>
-                        </Table.Thead>
-                        <Table.Tbody>{rows}</Table.Tbody>
-                      </Table>
-                    </>
+                    <Table striped highlightOnHover>
+                      <Table.Thead>
+                        <Table.Tr>
+                          <Table.Th>キーワード</Table.Th>
+                          <Table.Th>全体（件）</Table.Th>
+                          <Table.Th>R-18（件）</Table.Th>
+                          <Table.Th>R-18率（%）</Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>{rows}</Table.Tbody>
+                    </Table>
                   ) : (
                     <Center>
                       <Loader color="pink" />
