@@ -163,7 +163,7 @@ export default function Home() {
                   <Title order={2} mb={"lg"}>
                     キーワードごとのpixivイラストにおけるR-18率
                   </Title>
-                  <Group justify="flex-end" mt={-40}>
+                  <Group justify="flex-end" mb={"md"}>
                     <Button
                       color="pink"
                       onClick={() => {
