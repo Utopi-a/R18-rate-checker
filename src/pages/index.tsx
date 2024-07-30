@@ -14,7 +14,7 @@ import {
   Title,
 } from "@mantine/core";
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const safeJsonParse = (jsonString: string, defaultValue: string[]): string[] => {
   try {
@@ -27,12 +27,26 @@ const safeJsonParse = (jsonString: string, defaultValue: string[]): string[] => 
 export default function Home() {
   const [value, setValue] = useState("");
   const [genre, setGenre] = useState("");
-  const queries = safeJsonParse(value, []);
-  const pixivApi = api.pixiv.getIllustCount.useQuery({ queries, genre }, { enabled: false });
+  const queryData = useRef<{ queries: string[]; genre: string }>({ queries: [], genre: "" });
+
+  const [shouldFetch, setShouldFetch] = useState(false);
+
+  const pixivApi = api.pixiv.getIllustCount.useQuery({ ...queryData.current }, { enabled: false });
 
   const handleClick = () => {
-    void pixivApi.refetch();
+    queryData.current = { queries: safeJsonParse(value, []), genre };
+    console.log(queryData.current);
+    setShouldFetch(true);
   };
+
+  useEffect(() => {
+    if (shouldFetch) {
+      void pixivApi.refetch();
+      setShouldFetch(false);
+    }
+  }, [shouldFetch, pixivApi]);
+
+  console.log(queryData);
 
   const rows = pixivApi.data?.map((data, index) => (
     <Table.Tr key={index}>
@@ -63,7 +77,7 @@ export default function Home() {
         <AppShell.Main>
           <Container size={"lg"}>
             <Stack align="center">
-              <Group w={"100%"} justify="center" align="flex-end">
+              <Group w={"100%"} justify="center" align="flex-end" mt={40}>
                 <Stack w="60%">
                   <TextInput
                     value={genre}
@@ -71,7 +85,6 @@ export default function Home() {
                     label="ジャンル名"
                     placeholder="ジャンル名で指定をする際に入力してください"
                   />
-
                   <JsonInput
                     value={value}
                     onChange={setValue}
@@ -91,6 +104,9 @@ export default function Home() {
                 <Paper p="xl" shadow="xs" withBorder w="100%">
                   <Title order={2} mb={"lg"}>
                     キーワードごとのpixivイラストにおけるR-18率
+                  </Title>
+                  <Title order={3} mb={"lg"}>
+                    ジャンル：{genre === "" ? "指定なし" : genre}
                   </Title>
                   {!pixivApi.isLoading ? (
                     <Table striped highlightOnHover>
