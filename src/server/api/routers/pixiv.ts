@@ -14,12 +14,16 @@ export const pixivRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { queries, genre } = input;
 
+      console.log("queryでた");
+
       const encodedQueries = queries.map((query) => ({
         [query]: {
           all: encodeURIComponent(genre === "" ? query : query + " " + genre),
           R18: encodeURIComponent(genre === "" ? query + " R-18" : query + " " + genre + " R-18"),
         },
       }));
+
+      console.log("encodeした");
 
       const fetchTotalCount = async (encodedKeyword: string) => {
         const response = await fetch(
