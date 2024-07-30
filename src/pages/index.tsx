@@ -47,12 +47,12 @@ export default function Home() {
       | undefined
   ) => {
     const dataForExcel = [
-      ["キーワード", "全体（件）", "R-18（件）, R-18率（%）"],
+      ["キーワード", "全体（件）", "R-18（件）", "R-18率（%）"],
       ...(apiData?.map((data) => [
         Object.keys(data)[0],
         Object.values(data)[0]?.all,
         Object.values(data)[0]?.R18,
-        (((Object.values(data)[0]?.R18 ?? 0) / (Object.values(data)?.[0]?.all ?? 0)) * 100).toFixed(1),
+        Number((((Object.values(data)[0]?.R18 ?? 0) / (Object.values(data)?.[0]?.all ?? 0)) * 100).toFixed(1)),
       ]) ?? []),
     ];
     const sheet = XLSX.utils.aoa_to_sheet(dataForExcel);
@@ -132,16 +132,6 @@ export default function Home() {
               </Group>
               {(pixivApi.isLoading || pixivApi.isSuccess) && (
                 <Paper p="xl" shadow="xs" withBorder w="100%">
-                  <Center mb={"md"}>
-                    <Button
-                      color="pink"
-                      onClick={() => {
-                        handleDownloadExcel(pixivApi.data);
-                      }}
-                    >
-                      Excelダウンロード
-                    </Button>
-                  </Center>
                   <Title order={2} mb={"lg"}>
                     キーワードごとのpixivイラストにおけるR-18率
                   </Title>
@@ -149,17 +139,30 @@ export default function Home() {
                     ジャンル：{genre === "" ? "指定なし" : genre}
                   </Title>
                   {!pixivApi.isLoading ? (
-                    <Table striped highlightOnHover>
-                      <Table.Thead>
-                        <Table.Tr>
-                          <Table.Th>キーワード</Table.Th>
-                          <Table.Th>全体（件）</Table.Th>
-                          <Table.Th>R-18（件）</Table.Th>
-                          <Table.Th>R-18率（%）</Table.Th>
-                        </Table.Tr>
-                      </Table.Thead>
-                      <Table.Tbody>{rows}</Table.Tbody>
-                    </Table>
+                    <>
+                      <Group justify="flex-end" mt={-40}>
+                        <Button
+                          color="pink"
+                          onClick={() => {
+                            handleDownloadExcel(pixivApi.data);
+                          }}
+                        >
+                          Excelダウンロード
+                        </Button>
+                      </Group>
+
+                      <Table striped highlightOnHover>
+                        <Table.Thead>
+                          <Table.Tr>
+                            <Table.Th>キーワード</Table.Th>
+                            <Table.Th>全体（件）</Table.Th>
+                            <Table.Th>R-18（件）</Table.Th>
+                            <Table.Th>R-18率（%）</Table.Th>
+                          </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>{rows}</Table.Tbody>
+                      </Table>
+                    </>
                   ) : (
                     <Center>
                       <Loader color="pink" />

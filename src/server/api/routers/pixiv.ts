@@ -14,16 +14,12 @@ export const pixivRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { queries, genre } = input;
 
-      console.log("queryでた");
-
       const encodedQueries = queries.map((query) => ({
         [query]: {
           all: encodeURIComponent(genre === "" ? query : query + " " + genre),
           R18: encodeURIComponent(genre === "" ? query + " R-18" : query + " " + genre + " R-18"),
         },
       }));
-
-      console.log("encodeした");
 
       const fetchTotalCount = async (encodedKeyword: string) => {
         const response = await fetch(
@@ -51,17 +47,11 @@ export const pixivRouter = createTRPCRouter({
             method: "GET",
           }
         );
-
-        console.log("fetchした");
         console.log(response);
 
         const json = (await response.json()) as { body: { illust: { total: number } } };
 
-        console.log("jsonにした");
-
         const totalCount = json?.body?.illust?.total ?? 0;
-
-        console.log("totalcount出た");
 
         return totalCount;
       };
@@ -77,7 +67,6 @@ export const pixivRouter = createTRPCRouter({
         })
       );
 
-      console.log(totalCounts);
       return totalCounts;
     }),
 });
