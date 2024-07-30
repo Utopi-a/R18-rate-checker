@@ -1,3 +1,4 @@
+import { getIllustCount } from "@/feature/utils/getIllustCount";
 import { api } from "@/utils/api";
 import {
   AppShell,
@@ -30,6 +31,17 @@ export default function Home() {
   const [value, setValue] = useState("");
   const [genre, setGenre] = useState("");
   const queryData = useRef<{ queries: string[]; genre: string }>({ queries: [], genre: "" });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [pixivCounts, setPixivCounts] = useState<
+    Record<
+      string,
+      {
+        all: number;
+        R18: number;
+      }
+    >[]
+  >([]);
 
   const [shouldFetch, setShouldFetch] = useState(false);
 
@@ -66,10 +78,15 @@ export default function Home() {
     saveAs(blob, "R-18_rate.xlsx");
   };
 
-  const handleClick = () => {
+  const handleClick = async () => {
+    setIsLoading(true);
     queryData.current = { queries: safeJsonParse(value, []), genre };
-    setShouldFetch(true);
+    setPixivCounts(await getIllustCount({ queries: safeJsonParse(value, []), genre }));
+    setIsLoading(false);
+    // setShouldFetch(true);
   };
+
+  console.log(pixivCounts);
 
   useEffect(() => {
     if (shouldFetch) {
@@ -78,7 +95,7 @@ export default function Home() {
     }
   }, [shouldFetch, pixivApi]);
 
-  const rows = pixivApi.data?.map((data, index) => (
+  const rows = pixivCounts.map((data, index) => (
     <Table.Tr key={index}>
       <Table.Td>{Object.keys(data)[0]}</Table.Td>
       <Table.Td>{Object.values(data)[0]?.all}</Table.Td>
@@ -130,7 +147,7 @@ export default function Home() {
                   開始
                 </Button>
               </Group>
-              {(pixivApi.isLoading || pixivApi.isSuccess) && (
+              {(pixivCounts.length > 0 || isLoading) && (
                 <Paper p="xl" shadow="xs" withBorder w="100%">
                   <Title order={2} mb={"lg"}>
                     キーワードごとのpixivイラストにおけるR-18率
@@ -138,13 +155,13 @@ export default function Home() {
                   <Title order={3} mb={"lg"}>
                     ジャンル：{genre === "" ? "指定なし" : genre}
                   </Title>
-                  {!pixivApi.isLoading ? (
+                  {!isLoading ? (
                     <>
                       <Group justify="flex-end" mt={-40}>
                         <Button
                           color="pink"
                           onClick={() => {
-                            handleDownloadExcel(pixivApi.data);
+                            handleDownloadExcel(pixivCounts);
                           }}
                         >
                           Excelダウンロード
