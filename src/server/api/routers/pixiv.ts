@@ -51,7 +51,7 @@ export const pixivRouter = createTRPCRouter({
             method: "GET",
           }
         ).catch((error) => {
-          console.error(error);
+          console.log(error);
           return {} as Response;
         });
 
@@ -59,7 +59,7 @@ export const pixivRouter = createTRPCRouter({
 
         const json = (await response.json()) as { body: { illust: { total: number } } };
 
-        console.log("jsonにした")
+        console.log("jsonにした");
 
         const totalCount = json?.body?.illust?.total ?? 0;
 
