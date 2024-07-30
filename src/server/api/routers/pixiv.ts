@@ -26,6 +26,8 @@ export const pixivRouter = createTRPCRouter({
           `https://www.pixiv.net/ajax/search/illustrations/${encodedKeyword}?word=${encodedKeyword}&order=date_d&mode=&p=1&csw=0&s_mode=s_tag&type=illust_and_ugoira&lang=ja`,
           {
             headers: {
+              UserAgent:
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
               accept: "application/json",
               // "accept-language": "ja-JP,ja;q=0.9,en-US;q=0.8,en;q=0.7",
               // baggage:
@@ -48,6 +50,7 @@ export const pixivRouter = createTRPCRouter({
           }
         );
         console.log(response);
+        console.log(response.url);
 
         const json = (await response.json()) as { body: { illust: { total: number } } };
 
