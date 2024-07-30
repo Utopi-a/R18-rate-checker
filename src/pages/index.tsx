@@ -1,9 +1,15 @@
+import { api } from "@/utils/api";
 import { Button, Title } from "@mantine/core";
 import Head from "next/head";
 import { useState } from "react";
 
 export default function Home() {
   const [value, setValue] = useState(0);
+
+  const pixivApi = api.pixiv.getIllustCount.useQuery({ queries: ["月村手毬", "輿水幸子", "佐倉杏子"] });
+
+  console.log(pixivApi.data);
+
   return (
     <>
       <Head>
