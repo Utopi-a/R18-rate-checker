@@ -9,10 +9,11 @@ export const getIllustCount = async ({ queries, genre }: { queries: string[]; ge
   const fetchTotalCount = async (encodedKeyword: string) => {
     try {
       const response = await fetch(
-        `http://localhost:3001/proxy?url=${encodeURIComponent(
+        `https://melodious-tapioca-00e903.netlify.app/.netlify/functions/proxy/?url=${encodeURIComponent(
           `https://www.pixiv.net/ajax/search/illustrations/${encodedKeyword}?word=${encodedKeyword}&order=date_d&mode=&p=1&csw=0&s_mode=s_tag&type=illust_and_ugoira&lang=ja`
         )}`
       );
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -73,15 +74,11 @@ export const getIllustCount = async ({ queries, genre }: { queries: string[]; ge
       await new Promise((resolve) => setTimeout(resolve, index * 500));
 
       const allCount = await fetchTotalCount(Object.values(encodedQuery)[0]?.all ?? "");
-      console.log("allCount: ", allCount);
       const r18Count = await fetchTotalCount(Object.values(encodedQuery)[0]?.R18 ?? "");
-      console.log("r18Count: ", r18Count);
 
       return { [queries[index] ?? "No Keyword"]: { all: allCount, R18: r18Count } };
     })
   );
-
-  console.log("totalCounts: ", totalCounts);
 
   return totalCounts;
 };
