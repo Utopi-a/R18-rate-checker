@@ -71,7 +71,7 @@ export const getIllustCount = async ({ queries, genre }: { queries: string[]; ge
 
   const totalCounts = await Promise.all(
     encodedQueries.map(async (encodedQuery, index) => {
-      await new Promise((resolve) => setTimeout(resolve, index * 500));
+      await new Promise((resolve) => setTimeout(resolve, index * 5000));
 
       const allCount = await fetchTotalCount(Object.values(encodedQuery)[0]?.all ?? "");
       const r18Count = await fetchTotalCount(Object.values(encodedQuery)[0]?.R18 ?? "");
