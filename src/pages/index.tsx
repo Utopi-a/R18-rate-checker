@@ -13,8 +13,10 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import saveAs from "file-saver";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
+import * as XLSX from "xlsx";
 
 const safeJsonParse = (jsonString: string, defaultValue: string[]): string[] => {
   try {
@@ -33,9 +35,39 @@ export default function Home() {
 
   const pixivApi = api.pixiv.getIllustCount.useQuery({ ...queryData.current }, { enabled: false });
 
+  const handleDownloadExcel = (
+    apiData:
+      | Record<
+          string,
+          {
+            all: number;
+            R18: number;
+          }
+        >[]
+      | undefined
+  ) => {
+    const dataForExcel = [
+      ["キーワード", "全体（件）", "R-18（件）, R-18率（%）"],
+      ...(apiData?.map((data) => [
+        Object.keys(data)[0],
+        Object.values(data)[0]?.all,
+        Object.values(data)[0]?.R18,
+        (((Object.values(data)[0]?.R18 ?? 0) / (Object.values(data)?.[0]?.all ?? 0)) * 100).toFixed(1),
+      ]) ?? []),
+    ];
+    const sheet = XLSX.utils.aoa_to_sheet(dataForExcel);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, sheet, "Sheet1");
+
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" }) as BinaryData;
+
+    // バイナリデータをBlobに変換し、ファイルとして保存
+    const blob = new Blob([wbout], { type: "application/octet-stream" });
+    saveAs(blob, "R-18_rate.xlsx");
+  };
+
   const handleClick = () => {
     queryData.current = { queries: safeJsonParse(value, []), genre };
-    console.log(queryData.current);
     setShouldFetch(true);
   };
 
@@ -45,8 +77,6 @@ export default function Home() {
       setShouldFetch(false);
     }
   }, [shouldFetch, pixivApi]);
-
-  console.log(queryData);
 
   const rows = pixivApi.data?.map((data, index) => (
     <Table.Tr key={index}>
@@ -102,6 +132,16 @@ export default function Home() {
               </Group>
               {(pixivApi.isLoading || pixivApi.isSuccess) && (
                 <Paper p="xl" shadow="xs" withBorder w="100%">
+                  <Center mb={"md"}>
+                    <Button
+                      color="pink"
+                      onClick={() => {
+                        handleDownloadExcel(pixivApi.data);
+                      }}
+                    >
+                      Excelダウンロード
+                    </Button>
+                  </Center>
                   <Title order={2} mb={"lg"}>
                     キーワードごとのpixivイラストにおけるR-18率
                   </Title>
