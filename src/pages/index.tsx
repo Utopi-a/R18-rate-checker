@@ -143,9 +143,20 @@ export default function Home() {
                     minRows={4}
                   />
                 </Stack>
-                <Button color="pink" onClick={handleClick} w={100}>
-                  開始
-                </Button>
+                <Stack gap={8}>
+                  <Button
+                    color="pink"
+                    onClick={() => {
+                      setValue('["島風","雪風","天津風","鹿島","赤城","大井","最上"]');
+                      setGenre("艦これ");
+                    }}
+                  >
+                    デモ
+                  </Button>
+                  <Button color="pink" onClick={handleClick} w={100}>
+                    開始
+                  </Button>
+                </Stack>
               </Group>
               {(pixivCounts.length > 0 || isLoading) && (
                 <Paper p="xl" shadow="xs" withBorder w="100%">
