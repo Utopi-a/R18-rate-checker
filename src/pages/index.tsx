@@ -1,3 +1,4 @@
+import { getIllustCount } from "@/feature/utils/getIllustCount";
 import { api } from "@/utils/api";
 import {
   AppShell,
@@ -35,6 +36,14 @@ export default function Home() {
 
   const pixivApi = api.pixiv.getIllustCount.useQuery({ ...queryData.current }, { enabled: false });
 
+  let pixivCounts: Record<
+    string,
+    {
+      all: number;
+      R18: number;
+    }
+  >[] = [];
+
   const handleDownloadExcel = (
     apiData:
       | Record<
@@ -66,9 +75,10 @@ export default function Home() {
     saveAs(blob, "R-18_rate.xlsx");
   };
 
-  const handleClick = () => {
+  const handleClick = async () => {
     queryData.current = { queries: safeJsonParse(value, []), genre };
-    setShouldFetch(true);
+    pixivCounts = await getIllustCount({ queries: safeJsonParse(value, []), genre });
+    // setShouldFetch(true);
   };
 
   useEffect(() => {
@@ -78,7 +88,7 @@ export default function Home() {
     }
   }, [shouldFetch, pixivApi]);
 
-  const rows = pixivApi.data?.map((data, index) => (
+  const rows = pixivCounts.map((data, index) => (
     <Table.Tr key={index}>
       <Table.Td>{Object.keys(data)[0]}</Table.Td>
       <Table.Td>{Object.values(data)[0]?.all}</Table.Td>
@@ -130,7 +140,7 @@ export default function Home() {
                   開始
                 </Button>
               </Group>
-              {(pixivApi.isLoading || pixivApi.isSuccess) && (
+              {pixivCounts && (
                 <Paper p="xl" shadow="xs" withBorder w="100%">
                   <Title order={2} mb={"lg"}>
                     キーワードごとのpixivイラストにおけるR-18率
@@ -144,7 +154,7 @@ export default function Home() {
                         <Button
                           color="pink"
                           onClick={() => {
-                            handleDownloadExcel(pixivApi.data);
+                            handleDownloadExcel(pixivCounts);
                           }}
                         >
                           Excelダウンロード
