@@ -6,7 +6,14 @@ const port = 3001;
 
 app.use(express.json());
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+
+app.options("*", cors());
 
 // app.use((req, res, next) => {
 //   // res.header("Access-Control-Allow-Origin", "*");
@@ -41,10 +48,12 @@ app.get("/proxy", async (req, res) => {
         "sec-fetch-site": "cross-site",
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": "1",
-        cookie:
-          "p_ab_d_id=1549339903; privacy_policy_notification=0; a_type=0; b_type=1; c_type=104; yuid_b=QoRjlzM; p_ab_id=3; p_ab_id_2=0; privacy_policy_agreement=6; PHPSESSID=15216347_RAsBi2rKH8IhEwvFX7ZhU8lsIh2mGw9n; privacy_policy_agreement=6; cf_clearance=ZReZgf3sFSNRe1cq8em3bgujt8CNNariZEIOsiYP_AA-1722262574-1.0.1.1-mPW5AkAU4xzatXzuDPEe5C5X5KFlWctCjGZv7PyEMZ4MSk0NlX2Ycg6U4d6EckaNEBZtZCY_ExWxMsT9mBIpbw; _im_vid=01J3ZEPKJB35VZAQ0GVV14M3FH; cto_optout=1; default_service_is_touch=no; __cf_bm=kMU.myUXj443AkPWaaYpBOz3r.WQ1pKTLFSwK0LhVzs-1722341349-1.0.1.1-tYG2yA5CfTGCJDHpTpmvasvCeVOVS2cWcF.9fSdHqL1R4IOKZ_2fGuE0oRO3K_YmyZ5Q0fPWIQNVyqp2jInmRHKoXBct3rfKvtFy_rfJJP8",
+        cookie: "PHPSESSID=15216347_RAsBi2rKH8IhEwvFX7ZhU8lsIh2mGw9n;",
         baggage:
           "sentry-environment=production,sentry-release=d235c599ff057a99ced97357cf0a2d9db817c558,sentry-public_key=7b15ebdd9cf64efb88cfab93783df02a,sentry-trace_id=d25a78f4cbdb467b80fee0d7c53c3520,sentry-sample_rate=0.0001",
+        Referer: `https://www.pixiv.net/`,
+        useragent:
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
       },
       body: null,
       method: "GET",
