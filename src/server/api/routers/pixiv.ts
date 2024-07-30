@@ -67,6 +67,8 @@ export const pixivRouter = createTRPCRouter({
         })
       );
 
+      console.dir(totalCounts, { depth: null });
+
       return totalCounts;
     }),
 });
