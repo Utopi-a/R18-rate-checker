@@ -50,12 +50,10 @@ export const pixivRouter = createTRPCRouter({
             body: null,
             method: "GET",
           }
-        ).catch((error) => {
-          console.log(error);
-          return {} as Response;
-        });
+        );
 
         console.log("fetchした");
+        console.log(response);
 
         const json = (await response.json()) as { body: { illust: { total: number } } };
 
