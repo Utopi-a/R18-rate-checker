@@ -12,6 +12,7 @@ import {
   Stack,
   Table,
   Tabs,
+  Text,
   Textarea,
   TextInput,
   Title,
@@ -103,7 +104,7 @@ export default function Home() {
     <>
       <Head>
         <title>R18-rate-checker</title>
-        <meta name="description" content="pixivのキャラごとR18率をExcelに出力！" />
+        <meta name="description" content="pixivのキャラごとR-18率をExcelに出力！" />
         {/* <link rel="icon" href="/favicon.ico" /> */}
       </Head>
       <AppShell header={{ height: 80 }} padding="md">
@@ -116,6 +117,12 @@ export default function Home() {
         </AppShell.Header>
         <AppShell.Main>
           <Container size={"lg"}>
+            <Title order={2}>使い方</Title>
+            <Text>入力したジャンル名とキーワードで検索した結果の、R-18率を表示します。</Text>
+            <Text>Excel形式でのダウンロードも可能です。</Text>
+            <Text>キーワードは「，」、「,」、「、」で区切って入力してください。</Text>
+            <Text>JSONを選択すると、JSON形式での入力も可能です。</Text>
+            <Text>キーワードごとに約3秒かかります。ゆっくりお待ち下さい。</Text>
             <Stack align="center">
               <Group w={"100%"} justify="center" align="flex-end" mt={40}>
                 <Stack w="60%">
@@ -175,7 +182,7 @@ export default function Home() {
                 </Stack>
               </Group>
               {(pixivCounts.length > 0 || isLoading) && (
-                <Paper p="xl" shadow="xs" withBorder w="100%">
+                <Paper p="xl" shadow="xs" withBorder w="100%" radius="md">
                   <Title order={2} mb={"lg"}>
                     キーワードごとのpixivイラストにおけるR-18率
                   </Title>
