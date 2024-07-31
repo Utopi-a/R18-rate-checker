@@ -11,12 +11,14 @@ import {
   Paper,
   Stack,
   Table,
+  Tabs,
+  Textarea,
   TextInput,
   Title,
 } from "@mantine/core";
 import saveAs from "file-saver";
 import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 
 const safeJsonParse = (jsonString: string, defaultValue: string[]): string[] => {
@@ -29,6 +31,7 @@ const safeJsonParse = (jsonString: string, defaultValue: string[]): string[] => 
 
 export default function Home() {
   const [value, setValue] = useState("");
+  const [textValue, setTextValue] = useState("");
   const [genre, setGenre] = useState("");
   const queryData = useRef<{ queries: string[]; genre: string }>({ queries: [], genre: "" });
   const [isLoading, setIsLoading] = useState(false);
@@ -83,17 +86,7 @@ export default function Home() {
     queryData.current = { queries: safeJsonParse(value, []), genre };
     setPixivCounts(await getIllustCount({ queries: safeJsonParse(value, []), genre }));
     setIsLoading(false);
-    // setShouldFetch(true);
   };
-
-  console.log(pixivCounts);
-
-  useEffect(() => {
-    if (shouldFetch) {
-      void pixivApi.refetch();
-      setShouldFetch(false);
-    }
-  }, [shouldFetch, pixivApi]);
 
   const rows = pixivCounts.map((data, index) => (
     <Table.Tr key={index}>
@@ -110,7 +103,7 @@ export default function Home() {
     <>
       <Head>
         <title>R18-rate-checker</title>
-        <meta name="description" content="R18率をExcelに出力！" />
+        <meta name="description" content="pixivのキャラごとR18率をExcelに出力！" />
         {/* <link rel="icon" href="/favicon.ico" /> */}
       </Head>
       <AppShell header={{ height: 80 }} padding="md">
@@ -126,27 +119,50 @@ export default function Home() {
             <Stack align="center">
               <Group w={"100%"} justify="center" align="flex-end" mt={40}>
                 <Stack w="60%">
-                  <TextInput
-                    value={genre}
-                    onChange={(event) => setGenre(event.currentTarget.value)}
-                    label="ジャンル名"
-                    placeholder="ジャンル名で指定をする際に入力してください"
-                  />
-                  <JsonInput
-                    value={value}
-                    onChange={setValue}
-                    label="キーワード"
-                    placeholder='["キーワード1", "キーワード2", "キーワード3", ...]'
-                    validationError="JSONの形式が正しくありません。"
-                    formatOnBlur
-                    autosize
-                    minRows={4}
-                  />
+                  <Tabs defaultValue="text" color="pink">
+                    <Tabs.List mb="md">
+                      <Tabs.Tab value="text">TEXT</Tabs.Tab>
+                      <Tabs.Tab value="json">JSON</Tabs.Tab>
+                    </Tabs.List>
+                    <TextInput
+                      value={genre}
+                      onChange={(event) => setGenre(event.currentTarget.value)}
+                      label="ジャンル名"
+                      placeholder="ジャンル名で指定をする際に入力してください"
+                      mb="sm"
+                    />
+                    <Tabs.Panel value="text" variant="pills">
+                      <Textarea
+                        value={textValue}
+                        onChange={(event) => {
+                          setTextValue(event.currentTarget.value);
+                          setValue(JSON.stringify(event.currentTarget.value.split(/[,，、]/)));
+                        }}
+                        label="キーワード"
+                        placeholder="キーワード1,キーワード2,キーワード3, ..."
+                        autosize
+                        minRows={4}
+                      />
+                    </Tabs.Panel>
+                    <Tabs.Panel value="json">
+                      <JsonInput
+                        value={value}
+                        onChange={setValue}
+                        label="キーワード"
+                        placeholder='["キーワード1", "キーワード2", "キーワード3", ...]'
+                        validationError="JSONの形式が正しくありません。"
+                        formatOnBlur
+                        autosize
+                        minRows={4}
+                      />
+                    </Tabs.Panel>
+                  </Tabs>
                 </Stack>
                 <Stack gap={8}>
                   <Button
                     color="pink"
                     onClick={() => {
+                      setTextValue("島風,雪風,天津風,鹿島,赤城,大井,最上");
                       setValue('["島風","雪風","天津風","鹿島","赤城","大井","最上"]');
                       setGenre("艦これ");
                     }}
